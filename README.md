@@ -24,17 +24,18 @@ GitHub Action to read and write values from JSON files during workflow run.
 | `override`<span style="color:red">***</span> | -              | Override value to use if property is set.                                                     |
 | `noLog`                                      | `false`        | Do not log to console.                                                                        |
 
-#### Outputs
-
-| Output  | Description       |
-|---------|-------------------|
-| `value` | Value of property |
-
 #### Legend
 
 - <span style="color:red">*</span>: Required always
 - <span style="color:red">**</span>: Required, if mode is `write`
 - <span style="color:red">***</span>: Required, if `useOverride` is `true`
+
+### Outputs
+
+| Output  | Description       |
+|---------|-------------------|
+| `value` | Value of property |
+
 
 ## Examples
 
