@@ -1,0 +1,28 @@
+name: Read and Write to JSON files
+description: Extracts a value of a property specified as dot-separated path from defined JSON file
+author: "amochkin"
+inputs:
+  file:
+    description: "Path to JSON file; default is `package.json`"
+    default: "package.json"
+  mode:
+    description: "Mode of operation (`read`/`write`); default is `read`"
+    default: "read"
+  property:
+    description: "Dot-separated path to property (for example `a.b`)`"
+    required: true
+  value:
+    description: "Value to write to property, required for `write` mode"
+  nolog:
+    description: "Do not output value to the log; default is `false`"
+  fallback:
+    description: "Fallback file to use if file is not found"
+runs:
+  using: "node16"
+  main: "dist/index.js"
+branding:
+  icon: code
+  color: blue
+outputs:
+  value:
+    description: "Value of property (only if mode is `read`)"
