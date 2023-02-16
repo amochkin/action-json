@@ -11,8 +11,10 @@ interface IRunInputs {
 	property: string;
 	mode?: 'read' | 'write';
 	value?: string;
-	nolog?: 'true' | 'false' | '1' | '0';
+	quiet?: boolean;
 	fallback?: string;
+	overrideWith?: string;
+	useOverride?: boolean;
 }
 
 interface ITestCase {
@@ -35,7 +37,7 @@ describe('Function `run` read tests', () => {
 		property: 'version',
 		mode: 'read',
 		value: '',
-		nolog: 'false',
+		quiet: false,
 		fallback: '',
 	};
 
@@ -54,7 +56,14 @@ describe('Function `run` read tests', () => {
 
 		jest.spyOn(fs, 'readFileSync').mockImplementation(() => JSON.stringify(jsonString));
 
-		jest.spyOn(core, 'getInput').mockImplementation((name: string) => inputs[name as keyof IRunInputs] ?? '');
+		jest.spyOn(core, 'getInput').mockImplementation((name: string) => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			return inputs[name as keyof IRunInputs] || ('' as any);
+		});
+		jest.spyOn(core, 'getBooleanInput').mockImplementation((name: string) => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			return inputs[name as keyof IRunInputs] || (false as any);
+		});
 
 		const setOutputSpy = jest.spyOn(core, 'setOutput');
 		// eslint-disable-next-line @typescript-eslint/no-empty-function,@typescript-eslint/no-unused-vars
@@ -123,7 +132,7 @@ describe('Function `run` write tests', () => {
 		property: 'version',
 		mode: 'write',
 		value: '2.3.4',
-		nolog: 'false',
+		quiet: false,
 		fallback: '',
 	};
 
@@ -146,7 +155,14 @@ describe('Function `run` write tests', () => {
 
 		jest.spyOn(fs, 'readFileSync').mockImplementation(() => JSON.stringify(originalJson));
 
-		jest.spyOn(core, 'getInput').mockImplementation((name: string) => inputs[name as keyof IRunInputs] ?? '');
+		jest.spyOn(core, 'getInput').mockImplementation((name: string) => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			return inputs[name as keyof IRunInputs] || ('' as any);
+		});
+		jest.spyOn(core, 'getBooleanInput').mockImplementation((name: string) => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			return inputs[name as keyof IRunInputs] || (false as any);
+		});
 
 		const fsWriteSpy = jest.spyOn(fs, 'writeFileSync');
 		// eslint-disable-next-line @typescript-eslint/no-empty-function

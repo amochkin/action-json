@@ -1,6 +1,6 @@
-name: Read and Write to JSON files
-description: Extracts a value of a property specified as dot-separated path from defined JSON file
-author: "amochkin"
+name: Manipulate JSON files
+description: Reads or writes a value of a property specified as dot-separated path from defined JSON file
+author: "https://github.com/amochkin"
 inputs:
   file:
     description: "Path to JSON file; default is `package.json`"
@@ -16,12 +16,12 @@ inputs:
   valueType:
     description: "Type of value to write to property (`string`/`number`/`boolean`/`object`); default is `string`"
     default: "string"
-  nolog:
+  quiet:
     description: "Do not output value to the log; default is `false`"
     default: "false"
   fallback:
     description: "Fallback file to use if file is not found"
-  override:
+  overrideWith:
     description: "Override read value with this value"
   useOverride:
     description: "Flag: Use override value instead of read value"

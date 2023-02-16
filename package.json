@@ -28,7 +28,7 @@
   },
   "homepage": "https://github.com/amochkin/action-json#readme",
   "dependencies": {
-    "@actions/core": "^1.3.0",
+    "@actions/core": "^1.10.0",
     "ferramenta": "^1.0.17"
   },
   "devDependencies": {

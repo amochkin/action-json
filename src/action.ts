@@ -42,16 +42,16 @@ export const run = () => {
 		const file = path.join(workspace, core.getInput('file') || 'package.json');
 		const mode: 'read' | 'write' = core.getInput('mode') === 'write' ? 'write' : 'read';
 		const property = core.getInput('property');
-		const noLog = ['true', '1'].includes(core.getInput('nolog'));
+		const quiet = core.getBooleanInput('quiet');
 		const fallback = core.getInput('fallback');
-		const override = core.getInput('override');
-		const useOverride = ['true', '1'].includes(core.getInput('useOverride'));
+		const overrideWith = core.getInput('overrideWith');
+		const useOverride = core.getBooleanInput('useOverride');
 		const jsonPath = property.split('.');
 		const jsonObject = readFile(file);
 
 		if (!property) core.setFailed('Property is not specified');
 
-		core.debug(keyValue({ file, property, jsonPath, mode, noLog, fallback, override, useOverride }));
+		core.debug(keyValue({ file, property, jsonPath, mode, quiet, fallback, overrideWith, useOverride }));
 		core.debug(keyValue(jsonObject));
 
 		if (mode === 'read') {
@@ -59,7 +59,7 @@ export const run = () => {
 			const value = getValueByPath(jsonObject, jsonPath);
 			if (useOverride) {
 				/** Return override value if useOverride is set to true **/
-				outputValue(override);
+				outputValue(overrideWith);
 			} else if (typeof value === 'undefined') {
 				/** Return fallback value if value is undefined **/
 				outputValue(fallback);
@@ -70,13 +70,13 @@ export const run = () => {
 				/** Return string value **/
 				outputValue(String(value));
 			}
-			if (!noLog) core.notice(JSON.stringify({ file, property, value }));
+			if (!quiet) core.info(keyValue({ file, property, value }));
 		} else {
 			/** Write value **/
 			const value = core.getInput('value');
 			const valueType = core.getInput('valueType') || 'string';
 			writeFile(file, setValueByPath(jsonObject, jsonPath, castValueToType(value, valueType)));
-			if (!noLog) core.notice(JSON.stringify({ file, property, value, valueType }));
+			if (!quiet) core.info(JSON.stringify({ file, property, value, valueType }));
 		}
 	} catch (error) {
 		if (error instanceof Error) {
