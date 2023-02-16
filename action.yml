@@ -13,15 +13,24 @@ inputs:
     required: true
   value:
     description: "Value to write to property, required for `write` mode"
+  valueType:
+    description: "Type of value to write to property (`string`/`number`/`boolean`/`object`); default is `string`"
+    default: "string"
   nolog:
     description: "Do not output value to the log; default is `false`"
+    default: "false"
   fallback:
     description: "Fallback file to use if file is not found"
+  override:
+    description: "Override read value with this value"
+  useOverride:
+    description: "Flag: Use override value instead of read value"
+    default: "false"
 runs:
   using: "node16"
   main: "dist/index.js"
 branding:
-  icon: code
+  icon: settings
   color: blue
 outputs:
   value:
