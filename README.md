@@ -41,7 +41,7 @@ GitHub Action to read and write values from JSON files during workflow run.
 
 ### Read value
 
-#### 1. Read `version` property from `package.json` with fallback to `1.0.0`, and use it to create a release.
+#### 1. Read `version` property from `package.json` with fallback to `1.0.0`
 
 ```yaml
 jobs:
@@ -51,24 +51,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       
-      - name: Extract value from JSON
+      - name: Read version from package.json with fallback
         uses: amochkin/action-json@v1
-        id: extract-version
+        id: read-version
         with:
           property: version
           fallback: 1.0.0
-      
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.steps.extract-version.outputs.value }}
-          release_name: v${{ github.steps.extract-version.outputs.value }}
 ```
 
-#### 2. Override `version` property from `package.json` if branch is `main` and use it to create a release.
+#### 2. Override `version` property from `package.json` if branch is `main`
 
 ```yaml
 jobs:
@@ -78,25 +69,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       
-      - name: Extract value from JSON
+      - name: Read version from package.json with override
         uses: amochkin/action-json@v1
-        id: extract-version
+        id: read-version
         with:
           property: version
           useOverride: ${{ github.ref == 'refs/heads/main' }}
-          override: 1.0.0-${{ github.sha }}  
-      
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.steps.extract-version.outputs.value }}
-          release_name: v${{ github.steps.extract-version.outputs.value }}
+          override: 1.0.0-${{ github.sha }}
 ```
 
-#### 3. Read `scripts.build` property from `package.json`.
+#### 3. Read `scripts.build` property from `package.json`
 
 ```yaml
 jobs:
@@ -106,9 +88,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       
-      - name: Extract value from JSON
+      - name: Read scripts.build from package.json
         uses: amochkin/action-json@v1
-        id: extract-version
+        id: read-scripts-build
         with:
           property: scripts.build
 ```
@@ -125,9 +107,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
           
-      - name: Write name to package.json
+      - name: Write version to package.json
         uses: amochkin/action-json@v1
-        id: package-name-read
+        id: write-version
         with:
           mode: write
           property: version
@@ -144,9 +126,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
           
-      - name: Write name to package.json
+      - name: Write build.enabled to test.json
         uses: amochkin/action-json@v1
-        id: package-name-read
+        id: write-build-enabled
         with:
           mode: write
           file: test.json
