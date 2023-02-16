@@ -2,6 +2,9 @@ import * as core from '@actions/core';
 import fs from 'fs'; // <-- Import hack to fix "TypeError: Cannot redefine property: readFileSync"
 
 import { run } from '../src/action';
+import * as path from 'path';
+
+const workspace = process.env.GITHUB_WORKSPACE ?? './';
 
 interface IRunInputs {
 	file?: string;
@@ -151,7 +154,7 @@ describe('Function `run` write tests', () => {
 
 		run();
 
-		expect(fsWriteSpy).toBeCalledWith(inputs.file, JSON.stringify(modifiedJson, null, 2));
+		expect(fsWriteSpy).toBeCalledWith(path.join(workspace, inputs.file || ''), JSON.stringify(modifiedJson, null, 2));
 	};
 
 	const writeTestCases: ITestCase[] = [
