@@ -24,10 +24,5 @@ jobs:
       - name: Run build
         run: npm run build
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: my-artifact
-          path: path/to/artifact/world.txt
-
       - name: Create release
         uses: softprops/action-gh-release@v1
