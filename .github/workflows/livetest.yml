@@ -1,0 +1,39 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_override:
+        description: 'Version override (format is "a.b.c", or use "auto" to extract version from package.json)'
+        default: 'auto'
+      is_draft:
+        description: 'Is this release draft? (true/false)'
+        default: 'false'
+      is_prerelease:
+        description: 'Is this prerelease? (true/false)'
+        default: 'false'
+
+jobs:
+  livetest:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Print environment variables
+        run: printenv
+        shell: bash
+
+      - name: Read version from package.json
+        uses: amochkin/action-json@v1
+        id: read_version
+        with:
+          property: version
+          overrideWith: ${{ github.event.inputs.version_override }}
+          useOverride: ${{ github.event.inputs.version_override != 'auto' }}
+
+      - name: Print all output of read_version joined
+        run: echo all outputs ${{join(github.steps.read_version.outputs.*, '\n')}}
+        shell: bash
