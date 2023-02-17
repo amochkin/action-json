@@ -1,8 +1,11 @@
 import * as core from '@actions/core';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import fs from 'fs'; // <-- Import hack to fix "TypeError: Cannot redefine property: readFileSync"
 
 import { run } from '../src/action';
 import * as path from 'path';
+import { DEFAULT_JSON_FILE, DEFAULT_OUTPUT_NAME } from '../src/constants';
 
 const workspace = process.env.GITHUB_WORKSPACE ?? './';
 
@@ -13,8 +16,10 @@ interface IRunInputs {
 	value?: string;
 	quiet?: boolean;
 	fallback?: string;
-	overrideWith?: string;
-	useOverride?: boolean;
+	override_with?: string;
+	use_override?: boolean;
+	output_name?: string;
+	output_file?: string;
 }
 
 interface ITestCase {
@@ -33,17 +38,18 @@ describe('Function `run` general tests', () => {
 
 describe('Function `run` read tests', () => {
 	const defaultInputs: IRunInputs = {
-		file: 'package.json',
+		file: DEFAULT_JSON_FILE,
 		property: 'version',
 		mode: 'read',
 		value: '',
 		quiet: false,
 		fallback: '',
+		output_name: DEFAULT_OUTPUT_NAME,
 	};
 
 	const defaultJson = { name: 'action-json', version: '1.2.3' };
 
-	const defaultOutput = '1.2.3';
+	const defaultOutput = defaultJson.version;
 
 	/**
 	 * Provides convenience wrapper for JSON value read test cases.
@@ -54,7 +60,7 @@ describe('Function `run` read tests', () => {
 	const readTestFactory = (inputs = defaultInputs, jsonString: object = defaultJson, value = defaultOutput) => {
 		jest.clearAllMocks();
 
-		jest.spyOn(fs, 'readFileSync').mockImplementation(() => JSON.stringify(jsonString));
+		const fsReadSpy = jest.spyOn(fs, 'readFileSync').mockImplementation(() => JSON.stringify(jsonString));
 
 		jest.spyOn(core, 'getInput').mockImplementation((name: string) => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -71,13 +77,27 @@ describe('Function `run` read tests', () => {
 
 		run();
 
-		expect(setOutputSpy).toBeCalledWith('value', value);
+		expect(fsReadSpy).toBeCalledWith(path.join(workspace, inputs.file || ''));
+
+		expect(setOutputSpy).toBeCalledWith(inputs.output_name, value);
 	};
 
 	const readTestCases: ITestCase[] = [
 		{
 			name: 'defaults',
 			inputs: defaultInputs,
+			json: defaultJson,
+			output: defaultOutput,
+		},
+		{
+			name: 'defaults with custom file name',
+			inputs: { ...defaultInputs, file: 'custom-file-name.json' },
+			json: defaultJson,
+			output: defaultOutput,
+		},
+		{
+			name: 'defaults with custom output name',
+			inputs: { ...defaultInputs, output_name: 'custom-output-name' },
 			json: defaultJson,
 			output: defaultOutput,
 		},
@@ -128,12 +148,13 @@ describe('Function `run` read tests', () => {
 
 describe('Function `run` write tests', () => {
 	const defaultInputs: IRunInputs = {
-		file: 'package.json',
+		file: DEFAULT_JSON_FILE,
 		property: 'version',
 		mode: 'write',
 		value: '2.3.4',
 		quiet: false,
 		fallback: '',
+		output_file: DEFAULT_JSON_FILE,
 	};
 
 	const defaultJson = { name: 'action-json', version: '1.2.3' };
@@ -153,7 +174,7 @@ describe('Function `run` write tests', () => {
 	) => {
 		jest.clearAllMocks();
 
-		jest.spyOn(fs, 'readFileSync').mockImplementation(() => JSON.stringify(originalJson));
+		const fsReadSpy = jest.spyOn(fs, 'readFileSync').mockImplementation(() => JSON.stringify(originalJson));
 
 		jest.spyOn(core, 'getInput').mockImplementation((name: string) => {
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -170,13 +191,30 @@ describe('Function `run` write tests', () => {
 
 		run();
 
-		expect(fsWriteSpy).toBeCalledWith(path.join(workspace, inputs.file || ''), JSON.stringify(modifiedJson, null, 2));
+		expect(fsReadSpy).toBeCalledWith(path.join(workspace, inputs.file || ''));
+
+		expect(fsWriteSpy).toBeCalledWith(
+			path.join(workspace, inputs.output_file || ''),
+			JSON.stringify(modifiedJson, null, 2),
+		);
 	};
 
 	const writeTestCases: ITestCase[] = [
 		{
 			name: 'defaults',
 			inputs: defaultInputs,
+			json: defaultJson,
+			output: defaultOutputJson,
+		},
+		{
+			name: 'defaults with custom output name',
+			inputs: { ...defaultInputs, output_file: 'custom-output-file.json' },
+			json: defaultJson,
+			output: defaultOutputJson,
+		},
+		{
+			name: 'defaults with custom input and output name',
+			inputs: { ...defaultInputs, output_file: 'custom-output-file.json', file: 'custom-input-file.json' },
 			json: defaultJson,
 			output: defaultOutputJson,
 		},

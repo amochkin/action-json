@@ -12,17 +12,19 @@ GitHub Action to read and write values from JSON files during workflow run.
 
 ### Inputs
 
-| Input                                            | Default        | Description                                                                                   |
-|--------------------------------------------------|----------------|-----------------------------------------------------------------------------------------------|
-| `property`<span style="color:red">*</span>       | -              | Property to read or write. Example: `a.b.c`                                                   |
-| `file`                                           | `package.json` | Path to JSON file relative to workspace.                                                      |
-| `mode`                                           | `read`         | Mode of operation. Possible values: `read` or `write`.                                        |
-| `fallback`                                       | -              | Fallback value to use if property is not set.                                                 |
-| `value`<span style="color:red">**</span>         | -              | Value to write to property.                                                                   |
-| `valueType`                                      | `string`       | Value type to write to property. Valid types: `string`, `number`, `object`, `boolean`, `null` | 
-| `useOverride`                                    | `false`        | Use override value if property is set.                                                        |
-| `overrideWith`<span style="color:red">***</span> | -              | Override value to use if property is set.                                                     |
-| `quiet`                                          | `false`        | Do not log anything to console.                                                               |
+| Input                                             | Default        | Description                                                                                   |
+|---------------------------------------------------|----------------|-----------------------------------------------------------------------------------------------|
+| `property`<span style="color:red">*</span>        | -              | Property to read or write. Example: `a.b.c`                                                   |
+| `file`                                            | `package.json` | Path to JSON file relative to workspace.                                                      |
+| `mode`                                            | `read`         | Mode of operation. Possible values: `read` or `write`.                                        |
+| `fallback`                                        | -              | Fallback value to use if property is not set.                                                 |
+| `value`<span style="color:red">**</span>          | -              | Value to write to property.                                                                   |
+| `value_type`                                      | `string`       | Value type to write to property. Valid types: `string`, `number`, `object`, `boolean`, `null` | 
+| `use_override`                                    | `false`        | Use override value if property is set.                                                        |
+| `override_with`<span style="color:red">***</span> | -              | Override value to use if property is set.                                                     |
+| `output_name`                                     | `value`        | Define output name for read value.                                                            |
+| `output_file`                                     | `false`        | Do not log anything to console.                                                               |
+| `quiet`                                           | `false`        | Do not log anything to console.                                                               |
 
 #### Legend
 
@@ -74,8 +76,8 @@ jobs:
         id: read-version
         with:
           property: version
-          useOverride: ${{ github.ref == 'refs/heads/main' }}
-          overrideWith: 1.0.0-${{ github.sha }}
+          use_override: ${{ github.ref == 'refs/heads/main' }}
+          override_with: 1.0.0-${{ github.sha }}
 ```
 
 #### 3. Read `scripts.build` property from `package.json`
@@ -134,5 +136,5 @@ jobs:
           file: test.json
           property: build.enabled
           value: true
-          valueType: boolean  
+          value_type: boolean  
 ```
