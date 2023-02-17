@@ -13,7 +13,7 @@ inputs:
     required: true
   value:
     description: "Value to write to property, required for `write` mode"
-  valueType:
+  value_type:
     description: "Type of value to write to property (`string`/`number`/`boolean`/`object`); default is `string`"
     default: "string"
   quiet:
@@ -21,11 +21,16 @@ inputs:
     default: "false"
   fallback:
     description: "Fallback file to use if file is not found"
-  overrideWith:
+  override_with:
     description: "Override read value with this value"
-  useOverride:
+  use_override:
     description: "Flag: Use override value instead of read value"
     default: "false"
+  output_name:
+    description: "Name of output variable to use"
+    default: "value"
+  output_file:
+    description: "Path to file to write output value to. Defaults to the same file as input (write in-place)"
 runs:
   using: "node16"
   main: "dist/index.js"
@@ -34,4 +39,4 @@ branding:
   color: blue
 outputs:
   value:
-    description: "Value of property (only if mode is `read`)"
+    description: "Value of property (only if mode is `read`). Can be override with `output_name` input."
