@@ -1,4 +1,4 @@
-name: Release
+name: Live Test (only manual)
 
 on:
   workflow_dispatch:
