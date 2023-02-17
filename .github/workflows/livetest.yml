@@ -1,4 +1,4 @@
-name: Live Test (only manual)
+name: Manual Live Test
 
 on:
   workflow_dispatch:
