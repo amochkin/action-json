@@ -38,22 +38,29 @@ const outputValue = (value: any): void => {
 };
 
 export const run = () => {
+	// eslint-disable-next-line no-console
+	console.log('Running action...');
+	// eslint-disable-next-line no-console
+	console.log('Workspace:', workspace);
+
+	const file = path.join(workspace, core.getInput('file') || 'package.json');
+	const mode: 'read' | 'write' = core.getInput('mode') === 'write' ? 'write' : 'read';
+	const property = core.getInput('property');
+	const quiet = core.getBooleanInput('quiet');
+	const fallback = core.getInput('fallback');
+	const overrideWith = core.getInput('overrideWith');
+	const useOverride = core.getBooleanInput('useOverride');
+	const jsonPath = property.split('.');
+	const jsonObject = readFile(file);
+
+	if (!property) {
+		core.setFailed('Property is not specified');
+		return;
+	}
+
+	// eslint-disable-next-line no-console
+	console.log(keyValue({ file, property, jsonPath, mode, quiet, fallback, overrideWith, useOverride }));
 	try {
-		const file = path.join(workspace, core.getInput('file') || 'package.json');
-		const mode: 'read' | 'write' = core.getInput('mode') === 'write' ? 'write' : 'read';
-		const property = core.getInput('property');
-		const quiet = core.getBooleanInput('quiet');
-		const fallback = core.getInput('fallback');
-		const overrideWith = core.getInput('overrideWith');
-		const useOverride = core.getBooleanInput('useOverride');
-		const jsonPath = property.split('.');
-		const jsonObject = readFile(file);
-
-		if (!property) core.setFailed('Property is not specified');
-
-		core.debug(keyValue({ file, property, jsonPath, mode, quiet, fallback, overrideWith, useOverride }));
-		core.debug(keyValue(jsonObject));
-
 		if (mode === 'read') {
 			/** Read value **/
 			const value = getValueByPath(jsonObject, jsonPath);
