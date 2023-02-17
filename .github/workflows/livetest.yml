@@ -6,6 +6,9 @@ on:
       version_override:
         description: 'Version override (format is "a.b.c", or use "auto" to extract version from package.json)'
         default: 'auto'
+      fallback:
+        description: 'Fallback value'
+        default: '0.0.0'
       is_draft:
         description: 'Is this release draft? (true/false)'
         default: 'false'
@@ -35,6 +38,7 @@ jobs:
         id: read_version
         with:
           property: version
+          fallback: ${{ github.event.inputs.fallback }}
           overrideWith: ${{ github.event.inputs.version_override }}
           useOverride: ${{ github.event.inputs.version_override != 'auto' }}
 
