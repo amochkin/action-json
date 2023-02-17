@@ -39,8 +39,6 @@ const outputValue = (value: any): void => {
 
 export const run = () => {
 	// eslint-disable-next-line no-console
-	console.log('Running action...');
-	// eslint-disable-next-line no-console
 	console.log('Workspace:', workspace);
 
 	const file = path.join(workspace, core.getInput('file') || 'package.json');
