@@ -59,7 +59,7 @@ jobs:
           output_file: ${{ github.event.inputs.output_file }}
           property: ${{ github.event.inputs.property }}
           fallback: ${{ github.event.inputs.fallback }}
-          override_with: ${{ github.event.inputs.override_with
+          override_with: ${{ github.event.inputs.override_with }}
           use_override: ${{ github.event.inputs.use_override }}
 
       - name: Print value output
