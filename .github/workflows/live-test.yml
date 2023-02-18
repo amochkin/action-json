@@ -22,8 +22,8 @@ on:
         description: 'JSON Property (dot separated)'
         default: 'version'
       override_with:
-        description: 'Version override (format is "a.b.c", or use "auto" to extract version from package.json)'
-        default: 'auto'
+        description: 'Override value:'
+        default: '2.3.4'
       use_override:
         description: 'Use override? (true/false)'
         default: 'false'
