@@ -52,6 +52,8 @@ const outputValue = (value: any, outputName = 'value'): void => {
 	if (process.env.GITHUB_OUTPUT) {
 		core.debug('Also output to:' + keyValue({ GITHUB_OUTPUT: process.env.GITHUB_OUTPUT }));
 		appendFile(process.env.GITHUB_OUTPUT, `${outputName}=${value}`);
+	} else {
+		core.debug('GITHUB_OUTPUT is not set');
 	}
 };
 
