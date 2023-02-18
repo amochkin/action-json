@@ -1,0 +1,75 @@
+name: Manual Live Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Mode (read/write)'
+        default: 'read'
+      file:
+        description: 'JSON File (relative to root)'
+        default: 'package.json'
+      value:
+        description: 'Value to set'
+        default: '1.2.3'
+      output_name:
+        description: 'Output name'
+        default: 'value'
+      fallback:
+        description: 'Fallback value'
+        default: '0.0.0'
+      property:
+        description: 'JSON Property (dot separated)'
+        default: 'version'
+      override_with:
+        description: 'Version override (format is "a.b.c", or use "auto" to extract version from package.json)'
+        default: 'auto'
+      use_override:
+        description: 'Use override? (true/false)'
+        default: 'false'
+      output_file:
+        description: 'Output file (relative to root)'
+        default: 'package.json'
+
+jobs:
+  live-test:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Print environment variables
+        run: printenv
+        shell: bash
+
+      - name: List files in workspace
+        run: ls -la "${GITHUB_WORKSPACE}"
+        shell: bash
+
+      - name: Read version from package.json
+        uses: amochkin/action-json@v1
+        id: read_version
+        with:
+          mode: ${{ github.event.inputs.mode }}
+          file: ${{ github.event.inputs.file }}
+          value: ${{ github.event.inputs.value }}
+          output_name: ${{ github.event.inputs.output_name }}
+          output_file: ${{ github.event.inputs.output_file }}
+          property: ${{ github.event.inputs.property }}
+          fallback: ${{ github.event.inputs.fallback }}
+          override_with: ${{ github.event.inputs.override_with
+          use_override: ${{ github.event.inputs.use_override }}
+
+      - name: Print value output
+        run: echo ${{ github.event.inputs.output_name }}="${{ github.steps.read_version.outputs[github.event.inputs.output_name] }}"
+        shell: bash
+
+      - name: Print file
+        run: cat ${{ github.event.inputs.output_file }}
+        shell: bash
+
+      - name: Print all output of read_version joined
+        run: echo all outputs ${{join(github.steps.read_version.outputs.*, '\n')}}
+        shell: bash
