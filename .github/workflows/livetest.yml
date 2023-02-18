@@ -39,8 +39,8 @@ jobs:
         with:
           property: version
           fallback: ${{ github.event.inputs.fallback }}
-          overrideWith: ${{ github.event.inputs.version_override }}
-          useOverride: ${{ github.event.inputs.version_override != 'auto' }}
+          override_with: ${{ github.event.inputs.version_override }}
+          use_override: ${{ github.event.inputs.version_override != 'auto' }}
 
       - name: Print all output of read_version joined
         run: echo all outputs ${{join(github.steps.read_version.outputs.*, '\n')}}
