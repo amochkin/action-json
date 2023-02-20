@@ -34,10 +34,9 @@ GitHub Action to read and write values from JSON files during workflow run.
 
 ### Outputs
 
-| Output  | Description       |
-|---------|-------------------|
-| `value` | Value of property |
-
+| Output  | Description                                                              |
+|---------|--------------------------------------------------------------------------|
+| `value` | Value of property. Note: output name can be set with 'output_name' input |
 
 ## Examples
 
@@ -55,10 +54,13 @@ jobs:
       
       - name: Read version from package.json with fallback
         uses: amochkin/action-json@v1
-        id: read-version
+        id: read_version
         with:
           property: version
           fallback: 1.0.0
+      - name: Output read value of 'version' property
+        run: echo ${{ steps.read_version.outputs.value }}
+        shell: bash
 ```
 
 #### 2. Override `version` property from `package.json` if branch is `main`
@@ -73,11 +75,14 @@ jobs:
       
       - name: Read version from package.json with override
         uses: amochkin/action-json@v1
-        id: read-version
+        id: read_version
         with:
           property: version
           use_override: ${{ github.ref == 'refs/heads/main' }}
           override_with: 1.0.0-${{ github.sha }}
+      - name: Output read value of 'version' property
+        run: echo ${{ steps.read_version.outputs.value }}
+        shell: bash
 ```
 
 #### 3. Read `scripts.build` property from `package.json`
@@ -92,9 +97,13 @@ jobs:
       
       - name: Read scripts.build from package.json
         uses: amochkin/action-json@v1
-        id: read-scripts-build
+        id: read_scripts_build
         with:
           property: scripts.build
+          
+      - name: Output read value of 'scripts.build' property
+        run: echo ${{ steps.read_scripts_build.outputs.value }}
+        shell: bash
 ```
 
 ### Write value
@@ -111,11 +120,15 @@ jobs:
           
       - name: Write version to package.json
         uses: amochkin/action-json@v1
-        id: write-version
+        id: write_version
         with:
           mode: write
           property: version
           value: 1.0.0
+          
+      - name: Output modified package.json
+        run: cat package.json
+        shell: bash 
 ```
 
 ### 2. Write `build.enabled` property to `test.json` with boolean value 
@@ -130,11 +143,15 @@ jobs:
           
       - name: Write build.enabled to test.json
         uses: amochkin/action-json@v1
-        id: write-build-enabled
+        id: write_build_enabled
         with:
           mode: write
           file: test.json
           property: build.enabled
           value: true
-          value_type: boolean  
+          value_type: boolean
+          
+      - name: Output created (or overwritten) test.json
+        run: cat test.json
+        shell: bash
 ```
