@@ -1,3 +1,5 @@
+[![Tests](https://github.com/amochkin/action-json/actions/workflows/tests.yml/badge.svg)](https://github.com/amochkin/action-json/actions/workflows/tests.yml)
+
 # GitHub Action JSON
 
 GitHub Action to read and write values from JSON files during workflow run.
