@@ -68,7 +68,7 @@ jobs:
           use_override: ${{ github.event.inputs.use_override }}
 
       - name: Print value output
-        run: echo ${{ github.event.inputs.output_name }}="${{ github.steps.read_version.outputs[github.event.inputs.output_name] }}"
+        run: echo ${{ github.event.inputs.output_name }}="${{ steps.read_version.outputs[github.event.inputs.output_name] }}"
         shell: bash
 
       - name: Print file
@@ -76,5 +76,5 @@ jobs:
         shell: bash
 
       - name: Print all output of read_version joined
-        run: echo all outputs ${{join(github.steps.read_version.outputs.*, '\n')}}
+        run: echo all outputs ${{join(steps.read_version.outputs.*, '\n')}}
         shell: bash
