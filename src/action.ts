@@ -32,35 +32,13 @@ const writeJSONFile = (file: string, obj: object): void => {
 	}
 };
 
-/**
- * Append string to a file.
- * @param file A file path.
- * @param str A string to write.
- */
-const appendFile = (file: string, str: string): void => {
-	try {
-		fs.appendFileSync(file, str);
-	} catch (error) {
-		core.setFailed(String(error));
-	}
-};
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const outputValue = (value: any, outputName = 'value'): void => {
-	core.debug(keyValue({ value }));
-	core.setOutput(outputName, value);
-	if (process.env.GITHUB_OUTPUT) {
-		core.debug('Also output to:' + keyValue({ GITHUB_OUTPUT: process.env.GITHUB_OUTPUT }));
-		appendFile(process.env.GITHUB_OUTPUT, `${outputName}=${value}`);
-	} else {
-		core.debug('GITHUB_OUTPUT is not set');
-	}
+const outputValue = (outputValue: any, outputName = 'value'): void => {
+	core.debug(keyValue({ outputName, outputValue }));
+	core.setOutput(outputName, outputValue);
 };
 
 export const run = () => {
-	// eslint-disable-next-line no-console
-	console.log('Workspace:', workspace);
-
 	const file = path.join(workspace, core.getInput('file') || DEFAULT_JSON_FILE);
 	const mode: 'read' | 'write' = core.getInput('mode') === 'write' ? 'write' : 'read';
 	const property = core.getInput('property');
@@ -77,8 +55,10 @@ export const run = () => {
 		return;
 	}
 
-	// eslint-disable-next-line no-console
-	console.log('Parameters:', { file, mode, property, outputName, quiet, fallback, overrideWith, useOverride });
+	core.debug(
+		'Resolved parameters: ' +
+			keyValue({ workspace, file, mode, property, outputName, quiet, fallback, overrideWith, useOverride }),
+	);
 
 	try {
 		if (mode === 'read') {
