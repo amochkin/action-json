@@ -32,7 +32,7 @@ inputs:
   output_file:
     description: "Path to file to write output value to. Defaults to the same file as input (write in-place)"
 runs:
-  using: "node16"
+  using: "node20"
   main: "dist/index.js"
 branding:
   icon: settings
