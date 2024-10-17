@@ -18,7 +18,7 @@ GitHub Action to read and write values from JSON files during workflow run.
 |---------------------------------------------------|----------------|-----------------------------------------------------------------------------------------------|
 | `property`<span style="color:red">*</span>        | -              | Property to read or write. Example: `a.b.c`                                                   |
 | `file`                                            | `package.json` | Path to JSON file relative to workspace.                                                      |
-| `mode`                                            | `read`         | Mode of operation. Possible values: `read` or `write`.                                        |
+| `mode`                                            | `read`         | Mode of operation. Possible values: `read`, `write` or `delete`.                              |
 | `fallback`                                        | -              | Fallback value to use if property is not set.                                                 |
 | `value`<span style="color:red">**</span>          | -              | Value to write to property.                                                                   |
 | `value_type`                                      | `string`       | Value type to write to property. Valid types: `string`, `number`, `object`, `boolean`, `null` | 
@@ -156,4 +156,28 @@ jobs:
       - name: Output created (or overwritten) test.json
         run: cat test.json
         shell: bash
+```
+
+### Delete value
+
+### 1. Delete `version` property from `package.json`
+
+```yaml
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+          
+      - name: Write version to package.json
+        uses: amochkin/action-json@v1
+        id: delete_version
+        with:
+          mode: delete
+          property: version
+          
+      - name: Output modified package.json
+        run: cat package.json
+        shell: bash 
 ```

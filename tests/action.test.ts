@@ -3,7 +3,7 @@ import * as core from '@actions/core';
 // @ts-ignore
 import fs from 'fs'; // <-- Import hack to fix "TypeError: Cannot redefine property: readFileSync"
 
-import { run } from '../src/action';
+import { ModeType, run } from '../src/action';
 import * as path from 'path';
 import { DEFAULT_JSON_FILE, DEFAULT_OUTPUT_NAME } from '../src/constants';
 
@@ -12,7 +12,7 @@ const workspace = process.env.GITHUB_WORKSPACE ?? './';
 interface IRunInputs {
 	file?: string;
 	property: string;
-	mode?: 'read' | 'write';
+	mode?: ModeType;
 	value?: string;
 	quiet?: boolean;
 	fallback?: string;
@@ -236,5 +236,97 @@ describe('Function `run` write tests', () => {
 		test(`${t.name} [${i + 1}]: inputs: ${JSON.stringify(t.inputs)} expected-output: '${JSON.stringify(
 			t.output,
 		)}' json: ${JSON.stringify(t.json)}`, () => writeTestFactory(t.inputs, t.json, t.output)),
+	);
+});
+
+describe('Function `run` delete tests', () => {
+	const defaultInputs: IRunInputs = {
+		file: DEFAULT_JSON_FILE,
+		property: 'version',
+		mode: 'delete',
+		quiet: false,
+		fallback: '',
+		output_file: DEFAULT_JSON_FILE,
+	};
+
+	const defaultJson = { name: 'action-json', version: '1.2.3' };
+
+	const defaultOutputJson = { name: 'action-json' };
+
+	/**
+	 * Provides convenience wrapper for JSON value delete test cases.
+	 * @param inputs Test case inputs.
+	 * @param originalJson JSON object to read.
+	 * @param modifiedJson JSON object to write.
+	 */
+	const deleteTestFactory = (
+		inputs = defaultInputs,
+		originalJson: object = defaultJson,
+		modifiedJson: object = defaultOutputJson,
+	) => {
+		jest.clearAllMocks();
+
+		const fsReadSpy = jest.spyOn(fs, 'readFileSync').mockImplementation(() => JSON.stringify(originalJson));
+
+		jest.spyOn(core, 'getInput').mockImplementation((name: string) => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			return inputs[name as keyof IRunInputs] || ('' as any);
+		});
+		jest.spyOn(core, 'getBooleanInput').mockImplementation((name: string) => {
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			return inputs[name as keyof IRunInputs] || (false as any);
+		});
+
+		const fsWriteSpy = jest.spyOn(fs, 'writeFileSync');
+		// eslint-disable-next-line @typescript-eslint/no-empty-function
+		fsWriteSpy.mockImplementation(() => {});
+
+		run();
+
+		expect(fsReadSpy).toBeCalledWith(path.join(workspace, inputs.file || ''));
+
+		expect(fsWriteSpy).toBeCalledWith(
+			path.join(workspace, inputs.output_file || ''),
+			JSON.stringify(modifiedJson, null, 2),
+		);
+	};
+
+	const writeTestCases: ITestCase[] = [
+		{
+			name: 'defaults',
+			inputs: defaultInputs,
+			json: defaultJson,
+			output: defaultOutputJson,
+		},
+		{
+			name: 'defaults with custom output name',
+			inputs: { ...defaultInputs, output_file: 'custom-output-file.json' },
+			json: defaultJson,
+			output: defaultOutputJson,
+		},
+		{
+			name: 'defaults with custom input and output name',
+			inputs: { ...defaultInputs, output_file: 'custom-output-file.json', file: 'custom-input-file.json' },
+			json: defaultJson,
+			output: defaultOutputJson,
+		},
+		{
+			name: 'non-existing property',
+			inputs: { ...defaultInputs, property: 'non-existent' },
+			json: defaultJson,
+			output: { ...defaultJson },
+		},
+		{
+			name: 'empty json',
+			inputs: { ...defaultInputs, property: 'new' },
+			json: {},
+			output: {},
+		},
+	];
+
+	writeTestCases.forEach((t, i) =>
+		test(`${t.name} [${i + 1}]: inputs: ${JSON.stringify(t.inputs)} expected-output: '${JSON.stringify(
+			t.output,
+		)}' json: ${JSON.stringify(t.json)}`, () => deleteTestFactory(t.inputs, t.json, t.output)),
 	);
 });
