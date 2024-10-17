@@ -38,9 +38,21 @@ const outputValue = (outputValue: any, outputName = 'value'): void => {
 	core.setOutput(outputName, outputValue);
 };
 
+const stringInArrayOrThrow = <T>(value: string, array: string[], message: string): T | void => {
+	if (!array.includes(value)) {
+		core.setFailed(message);
+		return;
+	}
+
+	return value as T;
+}
+
+export type ModeType = 'read' | 'write' | 'delete';
+
 export const run = () => {
 	const file = path.join(workspace, core.getInput('file') || DEFAULT_JSON_FILE);
-	const mode: 'read' | 'write' = core.getInput('mode') === 'write' ? 'write' : 'read';
+
+	const mode = stringInArrayOrThrow<ModeType>(core.getInput('mode'), ['read', 'write', 'delete'], 'Invalid mode');
 	const property = core.getInput('property');
 	const outputName = core.getInput('output_name') || DEFAULT_OUTPUT_NAME;
 	const quiet = core.getBooleanInput('quiet');
@@ -78,13 +90,20 @@ export const run = () => {
 				outputValue(String(output), outputName);
 			}
 			if (!quiet) core.info(keyValue({ file, property, value: output, outputName }));
-		} else {
+		} else if (mode === 'write') {
 			/** Write value **/
 			const value = core.getInput('value');
 			const valueType = core.getInput('value_type') || 'string';
 			const outputFile = core.getInput('output_file') ? path.join(workspace, core.getInput('output_file')) : file;
 			writeJSONFile(outputFile, setValueByPath(jsonObject, jsonPath, castValueToType(value, valueType)));
 			if (!quiet) core.info(JSON.stringify({ file, property, value, valueType }));
+		} else if (mode === 'delete') {
+			/** Delete value **/
+			const outputFile = core.getInput('output_file') ? path.join(workspace, core.getInput('output_file')) : file;
+			writeJSONFile(outputFile, { ...setValueByPath(jsonObject, jsonPath, undefined) });
+			if (!quiet) core.info(JSON.stringify({ file, property }));
+		} else {
+			core.setFailed('Invalid mode');
 		}
 	} catch (error) {
 		if (error instanceof Error) {

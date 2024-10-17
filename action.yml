@@ -6,7 +6,7 @@ inputs:
     description: "Path to JSON file; default is `package.json`"
     default: "package.json"
   mode:
-    description: "Mode of operation (`read`/`write`); default is `read`"
+    description: "Mode of operation (`read`/`write`/`delete`); default is `read`"
     default: "read"
   property:
     description: "Dot-separated path to property (for example `a.b`)`"
